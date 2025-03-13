@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneva/data/providers/auth_provider.dart';
-import 'package:moneva/presentation/pages/home/home_page.dart';
+import 'package:moneva/presentation/pages/home/main_screen.dart';
 import 'package:moneva/presentation/pages/auth/register_page.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,7 @@ class LoginPage extends StatelessWidget {
                 final authProvider = Provider.of<AuthProvider>(context, listen: false);
                 bool success = await authProvider.login(emailController.text, passwordController.text);
                 if (success) {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomePage()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MainScreen()));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed')));
                 }
