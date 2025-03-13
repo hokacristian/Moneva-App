@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneva/presentation/pages/home/home_page.dart';
-import 'package:moneva/presentation/pages/history/history_input_page.dart';
+import 'package:moneva/presentation/pages/form/history_input_page.dart';
 import 'package:moneva/presentation/pages/outcome/outcome_page.dart';
 import 'package:moneva/presentation/pages/dampak/dampak_page.dart';
 import 'package:moneva/presentation/pages/profile/profile_page.dart';
