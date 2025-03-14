@@ -125,17 +125,20 @@ class ApiService {
 
 
   Future<Map<String, dynamic>> getFormInput(int id) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/form/input/$id'),
-      headers: {"Content-Type": "application/json"},
-    );
+  final response = await http.get(
+    Uri.parse('$baseUrl/form/input/$id'),
+    headers: {"Content-Type": "application/json"},
+  );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Gagal mendapatkan FormInput');
-    }
+  if (response.statusCode == 200) {
+    final decoded = jsonDecode(response.body);
+    // Ambil objek di dalam "data" agar langsung sesuai dengan struktur yang diinginkan UI
+    return decoded["data"]; 
+  } else {
+    throw Exception('Gagal mendapatkan FormInput');
   }
+}
+
 
   Future<Map<String, dynamic>> updateFormInput(int id, Map<String, dynamic> data) async {
     final response = await http.patch(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:moneva/data/providers/input_provider.dart';
+import 'package:moneva/presentation/pages/form/detail_form_page.dart';
 
 class HistoryInputPage extends StatefulWidget {
   @override
@@ -86,17 +87,3 @@ class _HistoryInputPageState extends State<HistoryInputPage> {
   }
 }
 
-// 🔥 Halaman Detail Form (Sementara Kosong)
-class DetailFormPage extends StatelessWidget {
-  final int formId;
-
-  const DetailFormPage({Key? key, required this.formId}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Detail Form ID: $formId")),
-      body: const Center(child: Text("Detail dari Form Input")),
-    );
-  }
-}
