@@ -68,4 +68,190 @@ class ApiService {
       throw Exception('Register failed: ${response.body}');
     }
   }
+
+  // 🔥 GET ALL FORM INPUTS
+  Future<List<Map<String, dynamic>>> getAllFormInputs() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/form/input'),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(data['data']);
+    } else {
+      throw Exception('Gagal mengambil semua FormInput');
+    }
+  }
+
+   Future<Map<String, dynamic>> postFormInput(Map<String, dynamic> data) async {
+  final token = await sessionManager.getToken();
+
+  if (token == null) {
+    print("🚨 Token tidak ditemukan di SessionManager!"); // Debugging
+    throw Exception("Token tidak ditemukan. Silakan login ulang.");
+  }
+
+  print("✅ Token yang dikirim ke API: $token"); // Debugging
+
+  var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/form/input'));
+  request.headers['Authorization'] = 'Bearer $token';
+  request.headers['Content-Type'] = 'application/json';
+
+  data.forEach((key, value) {
+    if (key != 'img') {
+      request.fields[key] = value.toString();
+    }
+  });
+
+  if (data['img'] != null) {
+    request.files.add(await http.MultipartFile.fromPath('img', data['img']));
+  }
+
+  final response = await request.send();
+  final responseBody = await response.stream.bytesToString();
+
+  if (response.statusCode == 201) {
+    return jsonDecode(responseBody);
+  } else {
+    print("🚨 Error Response dari API: $responseBody"); // Debugging
+    throw Exception('Gagal menambahkan FormInput: $responseBody');
+  }
+}
+
+
+
+
+  Future<Map<String, dynamic>> getFormInput(int id) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/form/input/$id'),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal mendapatkan FormInput');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateFormInput(int id, Map<String, dynamic> data) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl/form/input/$id'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal memperbarui FormInput');
+    }
+  }
+
+   // ✅ POST Dampak
+  Future<Map<String, dynamic>> postDampak(int formInputId, Map<String, dynamic> data) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/form/dampak/$formInputId'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal menambahkan Dampak: ${response.body}');
+    }
+  }
+
+  // ✅ PATCH Dampak
+  Future<Map<String, dynamic>> updateDampak(int id, Map<String, dynamic> data) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl/form/dampak/$id'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal memperbarui Dampak: ${response.body}');
+    }
+  }
+
+  // ✅ GET Dampak
+  Future<Map<String, dynamic>> getDampak(int id) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/form/dampak/$id'),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal mendapatkan Dampak');
+    }
+  }
+
+  // ✅ POST Outcome
+  Future<Map<String, dynamic>> postOutcome(int formInputId, Map<String, dynamic> data) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/form/outcome/$formInputId'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal menambahkan Outcome: ${response.body}');
+    }
+  }
+
+  // ✅ PATCH Outcome
+  Future<Map<String, dynamic>> updateOutcome(int id, Map<String, dynamic> data) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl/form/outcome/$id'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal memperbarui Outcome: ${response.body}');
+    }
+  }
+
+  // ✅ GET Outcome
+  Future<Map<String, dynamic>> getOutcome(int id) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/form/outcome/$id'),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Gagal mendapatkan Outcome');
+    }
+  }
+
+  // 🔥 GET Places (Daftar Lokasi)
+  Future<List<Map<String, dynamic>>> fetchPlaces() async {
+    final response = await http.get(Uri.parse('$baseUrl/places'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body)['data'];
+      return data.map((place) => {
+            'id': place['id'],
+            'name': place['name'],
+          }).toList();
+    } else {
+      throw Exception('Gagal mendapatkan daftar tempat');
+    }
+  }
+
 }

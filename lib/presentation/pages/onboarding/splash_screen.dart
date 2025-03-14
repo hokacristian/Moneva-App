@@ -19,22 +19,23 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> checkLoginStatus() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.initializeAuth();
-    
-    if (authProvider.isLoggedIn) {
-      await authProvider.fetchUserData(); // ✅ Tambahkan ini agar user data dimuat dulu
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainScreen()),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    }
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  await authProvider.initializeAuth(); // ✅ Panggil agar token terambil
+
+  if (authProvider.isLoggedIn) {
+    await authProvider.fetchUserData();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MainScreen()),
+    );
+  } else {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
