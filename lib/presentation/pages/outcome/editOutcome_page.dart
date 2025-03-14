@@ -16,12 +16,10 @@ class _EditOutcomePageState extends State<EditOutcomePage> {
   final _formKey = GlobalKey<FormState>();
   Map<String, dynamic> outcomeData = {
     // Data umum
-    "konsumsiAirPerTahun": 0.0,
+    "konsumsiAirPerTahun": "",
     "kualitasAir": "",
-    "rataRataTerpaparPenyakitSebelum": 0,
-    "rataRataTerpaparPenyakitSesudah": 0,
-    "awarenessMasyarakat": "",
-    "deskripsiAwareness": "",
+    "rataRataTerpaparPenyakitSebelum": "",
+    "rataRataTerpaparPenyakitSesudah": "",
     "penilaianSaranaAirBersih": "",
     "penilaianSanitasi": "",
     
@@ -185,11 +183,6 @@ void initState() {
                           if (_shouldShowField('rataRataTerpaparPenyakitSesudah'))
                             _buildTextField('rataRataTerpaparPenyakitSesudah', 'Rata-rata Terpapar Penyakit Sesudah', isNumeric: true),
                             
-                          if (_shouldShowField('awarenessMasyarakat'))
-                            _buildTextField('awarenessMasyarakat', 'Awareness Masyarakat'),
-                            
-                          if (_shouldShowField('deskripsiAwareness'))
-                            _buildTextField('deskripsiAwareness', 'Deskripsi Awareness'),
                             
                           if (_shouldShowField('penilaianSaranaAirBersih'))
                             _buildTextField('penilaianSaranaAirBersih', 'Penilaian Sarana Air Bersih'),

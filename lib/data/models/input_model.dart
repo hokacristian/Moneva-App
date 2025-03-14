@@ -14,7 +14,7 @@ class FormInput {
   final String pemakaianAir;
   final String sistemPengelolaan; // 🔥 Ganti dari sanitasi
   final String sumberAir;
-  final double hargaAir;
+  final int hargaAir;
   final double? pH; // 🔥 Tambahan
   final double? TDS; // 🔥 Tambahan
   final double? EC; // 🔥 Tambahan

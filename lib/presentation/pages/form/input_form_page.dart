@@ -34,7 +34,8 @@ class _InputFormPageState extends State<InputFormPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => Provider.of<InputProvider>(context, listen: false).fetchPlaces());
+    Future.microtask(() =>
+        Provider.of<InputProvider>(context, listen: false).fetchPlaces());
     _getCurrentLocation();
   }
 
@@ -98,37 +99,106 @@ class _InputFormPageState extends State<InputFormPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final places = Provider.of<InputProvider>(context).places;
-    return Scaffold(
-      appBar: AppBar(title: Text('Input Data')),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DropdownButtonFormField<String>(
-                  value: selectedLocation,
-                  hint: Text('Pilih Lokasi'),
-                  items: places.map((place) {
-                    return DropdownMenuItem<String>(
-                      value: place['name'].toString(),
-                      child: Text(place['name'].toString()),
+    // Tampilkan dialog untuk menambah lokasi
+void _showAddLocationDialog() {
+  final TextEditingController locationController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Tambah Lokasi"),
+        content: TextField(
+          controller: locationController,
+          decoration: InputDecoration(hintText: "Masukkan nama lokasi"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Batal
+            },
+            child: Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () {
+              final newLocation = locationController.text.trim();
+              if (newLocation.isNotEmpty) {
+                Provider.of<InputProvider>(context, listen: false)
+                    .createPlace({"name": newLocation})
+                    .then((success) {
+                  if (success) {
+                    // Jangan update selectedLocation secara otomatis
+                    // Jangan panggil fetchPlaces di sini
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Lokasi berhasil ditambahkan")),
                     );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedLocation = value;
-                    });
-                  },
-                  validator: (value) => value == null ? 'Pilih lokasi' : null,
-                ),
-                SizedBox(height: 16),
+                    Navigator.pop(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Gagal menambahkan lokasi")),
+                    );
+                  }
+                });
+              }
+            },
+            child: Text("Simpan"),
+          ),
+        ],
+      );
+    },
+  );
+}
 
+
+
+@override
+Widget build(BuildContext context) {
+  final places = Provider.of<InputProvider>(context).places;
+  
+  // Filter daftar lokasi agar hanya muncul lokasi dengan nama unik
+  final uniquePlaces = places.fold<List<Map<String, dynamic>>>([], (acc, element) {
+    if (!acc.any((item) => item['name'] == element['name'])) {
+      acc.add(element);
+    }
+    return acc;
+  });
+
+  return Scaffold(
+    appBar: AppBar(title: Text('Input Data')),
+    body: Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            DropdownButtonFormField<String>(
+  value: selectedLocation,
+  hint: Text('Pilih Lokasi'),
+  onTap: () {
+    Provider.of<InputProvider>(context, listen: false).fetchPlaces();
+  },
+  items: uniquePlaces.map((place) {
+    return DropdownMenuItem<String>(
+      value: place['name'].toString(),
+      child: Text(place['name'].toString()),
+    );
+  }).toList(),
+  onChanged: (value) {
+    setState(() {
+      selectedLocation = value;
+    });
+  },
+),
+
+
+              // Tombol Tambah Lokasi
+              TextButton.icon(
+                onPressed: _showAddLocationDialog,
+                icon: Icon(Icons.add),
+                label: Text("Tambah Lokasi"),
+              ),
+                SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: selectedBantuan,
                   hint: Text('Pilih Jenis Bantuan'),
@@ -146,21 +216,65 @@ class _InputFormPageState extends State<InputFormPage> {
                   validator: (value) => value == null ? 'Pilih jenis bantuan' : null,
                 ),
                 SizedBox(height: 16),
-                TextFormField(controller: jmlhBantuanController, decoration: InputDecoration(labelText: 'Jumlah Bantuan')),
-                TextFormField(controller: jmlhKKController, decoration: InputDecoration(labelText: 'Jumlah KK')),
-                TextFormField(controller: jmlhPerempuanController, decoration: InputDecoration(labelText: 'Jumlah Perempuan')),
-                TextFormField(controller: jmlhLakiController, decoration: InputDecoration(labelText: 'Jumlah Laki')),
-                TextFormField(controller: debitAirController, decoration: InputDecoration(labelText: 'Debit Air')),
-                TextFormField(controller: pemakaianAirController, decoration: InputDecoration(labelText: 'Pemakaian Air')),
-                TextFormField(controller: sistemPengelolaanController, decoration: InputDecoration(labelText: 'Sistem Pengelolaan')),
-                TextFormField(controller: sumberAirController, decoration: InputDecoration(labelText: 'Sumber Air')),
-                TextFormField(controller: hargaAirController, decoration: InputDecoration(labelText: 'Harga Air')),
-                TextFormField(controller: pHController, decoration: InputDecoration(labelText: 'pH')),
-                TextFormField(controller: TDSController, decoration: InputDecoration(labelText: 'TDS')),
-                TextFormField(controller: ECController, decoration: InputDecoration(labelText: 'EC')),
-                TextFormField(controller: ORPController, decoration: InputDecoration(labelText: 'ORP')),
+                TextFormField(
+                  controller: jmlhBantuanController,
+                  decoration: InputDecoration(labelText: 'Jumlah Bantuan'),
+                  keyboardType: TextInputType.number, 
+                ),
+                TextFormField(
+                  controller: jmlhKKController,
+                  decoration: InputDecoration(labelText: 'Jumlah KK'),
+                  keyboardType: TextInputType.number, 
+                ),
+                TextFormField(
+                  controller: jmlhPerempuanController,
+                  decoration: InputDecoration(labelText: 'Jumlah Perempuan'),
+                  keyboardType: TextInputType.number, 
+                ),
+                TextFormField(
+                  controller: jmlhLakiController,
+                  decoration: InputDecoration(labelText: 'Jumlah Laki'),
+                  keyboardType: TextInputType.number, 
+                ),
+                TextFormField(
+                  controller: debitAirController,
+                  decoration: InputDecoration(labelText: 'Jumlah debit air yang dihasilkan (l)'),
+                  keyboardType: TextInputType.number, 
+                ),
+                TextFormField(
+                  controller: pemakaianAirController,
+                  decoration: InputDecoration(labelText: 'Pemakaian Air(Untuk keperluan apa saja)'),
+                ),
+                TextFormField(
+                  controller: sistemPengelolaanController,
+                  decoration: InputDecoration(labelText: 'Sistem pengelolaan sanitasi dan sarana air bersih'),
+                ),
+                TextFormField(
+                  controller: sumberAirController,
+                  decoration: InputDecoration(labelText: 'Sumber Air'),
+                ),
+                TextFormField(
+                  controller: hargaAirController,
+                  decoration: InputDecoration(labelText: 'Harga Air yang dibayar'),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true), 
+                ),
+                TextFormField(
+                  controller: pHController,
+                  decoration: InputDecoration(labelText: 'pH'),
+                ),
+                TextFormField(
+                  controller: TDSController,
+                  decoration: InputDecoration(labelText: 'TDS(ppm)'),
+                ),
+                TextFormField(
+                  controller: ECController,
+                  decoration: InputDecoration(labelText: 'EC(µS/cm)'),
+                ),
+                TextFormField(
+                  controller: ORPController,
+                  decoration: InputDecoration(labelText: 'ORP(mV)'),
+                ),
                 SizedBox(height: 16),
-
                 Text('Latitude: ${latitude ?? "Mengambil..."}'),
                 Text('Longitude: ${longitude ?? "Mengambil..."}'),
                 SizedBox(height: 16),

@@ -254,4 +254,20 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> postPlace(Map<String, dynamic> data) async {
+  final url = Uri.parse('$baseUrl/places');
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(data),
+  );
+  if (response.statusCode == 201) {
+    final decoded = jsonDecode(response.body);
+    return decoded['data']; // Hanya kembalikan data
+  } else {
+    throw Exception("Gagal menambah lokasi: ${response.body}");
+  }
+}
+
+
 }

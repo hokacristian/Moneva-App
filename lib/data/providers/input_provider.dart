@@ -105,4 +105,27 @@ class InputProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> createPlace(Map<String, dynamic> data) async {
+  _isLoading = true;
+  notifyListeners();
+
+  try {
+    final newPlace = await apiService.postPlace(data);
+    debugPrint("New place created: $newPlace");
+    _places.add(newPlace);
+    _errorMessage = null;
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  } catch (e) {
+    _errorMessage = e.toString();
+    debugPrint("Error createPlace: $_errorMessage");
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+}
+
+
+
 }
