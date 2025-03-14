@@ -21,10 +21,13 @@ class _EditDampakPageState extends State<EditDampakPage> {
   bool isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     _loadDampakData();
-  }
+  });
+}
+
 
   Future<void> _loadDampakData() async {
     setState(() => isLoading = true);
@@ -133,26 +136,40 @@ class _EditDampakPageState extends State<EditDampakPage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
-                            _buildTextField("biayaBerobatSebelum", "Biaya Berobat Sebelum", isNumeric: true),
-                            _buildTextField("biayaBerobatSesudah", "Biaya Berobat Sesudah", isNumeric: true),
-                            _buildTextField("biayaAirBersihSebelum", "Biaya Air Bersih Sebelum", isNumeric: true),
-                            _buildTextField("biayaAirBersihSesudah", "Biaya Air Bersih Sesudah", isNumeric: true),
-                            _buildTextField("peningkatanEkonomiSebelum", "Peningkatan Ekonomi Sebelum", isNumeric: true),
-                            _buildTextField("peningkatanEkonomiSesudah", "Peningkatan Ekonomi Sesudah", isNumeric: true),
-                            _buildTextField("penurunanOrangSakitSebelum", "Penurunan Orang Sakit Sebelum", isNumeric: true),
-                            _buildTextField("penurunanOrangSakitSesudah", "Penurunan Orang Sakit Sesudah", isNumeric: true),
-                            _buildTextField("penurunanStuntingSebelum", "Penurunan Stunting Sebelum", isNumeric: true),
-                            _buildTextField("penurunanStuntingSesudah", "Penurunan Stunting Sesudah", isNumeric: true),
-                            _buildTextField("peningkatanIndeksKesehatanSebelum", "Peningkatan Indeks Kesehatan Sebelum", isNumeric: true),
-                            _buildTextField("peningkatanIndeksKesehatanSesudah", "Peningkatan Indeks Kesehatan Sesudah", isNumeric: true),
-                            _buildTextField("volumeLimbahDikelola", "Volume Limbah Dikelola", isNumeric: true),
-                            _buildTextField("penurunanIndexPencemaranSebelum", "Penurunan Index Pencemaran Sebelum", isNumeric: true),
-                            _buildTextField("penurunanIndexPencemaranSesudah", "Penurunan Index Pencemaran Sesudah", isNumeric: true),
                             _buildTextField("sumberAirSebelum", "Sumber Air Sebelum"),
                             _buildTextField("sumberAirSesudah", "Sumber Air Sesudah"),
+
                             _buildTextField("biayaListrikSebelum", "Biaya Listrik Sebelum", isNumeric: true),
                             _buildTextField("biayaListrikSesudah", "Biaya Listrik Sesudah", isNumeric: true),
+
+
+                            _buildTextField("biayaBerobatSebelum", "Biaya Berobat Sebelum", isNumeric: true),
+                            _buildTextField("biayaBerobatSesudah", "Biaya Berobat Sesudah", isNumeric: true),
+
+                            _buildTextField("biayaAirBersihSebelum", "Biaya Air Pemenuhan Bersih Sebelum", isNumeric: true),
+                            _buildTextField("biayaAirBersihSesudah", "Biaya Air Pemenuhan Bersih Sesudah", isNumeric: true),
+
+                            _buildTextField("peningkatanEkonomiSebelum", "Peningkatan Ekonomi Sebelum", isNumeric: true),
+                            _buildTextField("peningkatanEkonomiSesudah", "Peningkatan Ekonomi Sesudah", isNumeric: true),
+
+                            _buildTextField("penurunanOrangSakitSebelum", "Penurunan Orang Sakit Sebelum", isNumeric: true),
+                            _buildTextField("penurunanOrangSakitSesudah", "Penurunan Orang Sakit Sesudah", isNumeric: true),
+
+                            _buildTextField("penurunanStuntingSebelum", "Penurunan Stunting Sebelum", isNumeric: true),
+                            _buildTextField("penurunanStuntingSesudah", "Penurunan Stunting Sesudah", isNumeric: true),
+
+                            _buildTextField("peningkatanIndeksKesehatanSebelum", "Peningkatan Indeks Kesehatan Masyarakat Sebelum (terutama perempuan dan anak-anak) " , isNumeric: true),
+                            _buildTextField("peningkatanIndeksKesehatanSesudah", "Peningkatan Indeks Kesehatan Masyarakat Sesudah (terutama perempuan dan anak-anak) ", isNumeric: true),
+
+                            _buildTextField("volumeLimbahDikelola", "Volume Limbah Yang Berhasil Dikelola Masyarakat", isNumeric: true),
+
                             _buildCheckbox("prosesKonservasiAir", "Proses Konservasi Air"),
+
+                            _buildTextField("penurunanIndexPencemaranSebelum", "Penurunan Index Pencemaran Lingkungan Sebelum", isNumeric: true),
+                            _buildTextField("penurunanIndexPencemaranSesudah", "Penurunan Index Pencemaran Lingkungan Sesudah", isNumeric: true),
+                            
+                            
+          
                           ],
                         ),
                       ),

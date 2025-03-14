@@ -15,13 +15,11 @@ class EditOutcomePage extends StatefulWidget {
 class _EditOutcomePageState extends State<EditOutcomePage> {
   final _formKey = GlobalKey<FormState>();
   Map<String, dynamic> outcomeData = {
-    // Data umum
+    // Pertanyaan Umum (selalu tampil)
     "konsumsiAirPerTahun": "",
-    "kualitasAir": "",
+    "kualitasAir": false, // ditampilkan sebagai checkbox
     "rataRataTerpaparPenyakitSebelum": "",
     "rataRataTerpaparPenyakitSesudah": "",
-    "penilaianSaranaAirBersih": "",
-    "penilaianSanitasi": "",
     
     // Data boolean umum
     "bisaDipakaiMCK": false,
@@ -56,36 +54,28 @@ class _EditOutcomePageState extends State<EditOutcomePage> {
   bool isLoading = false;
 
   @override
-void initState() {
-  super.initState();
-  // Hapus pemanggilan createOutcome dari sini
-  // Future.microtask(() {
-  //   setState(() => isLoading = true);
-  //   Provider.of<OutcomeProvider>(context, listen: false)
-  //       .createOutcome(widget.formId, outcomeData)
-  //       .then((_) => setState(() => isLoading = false));
-  // });
-}
+  void initState() {
+    super.initState();
+    // Tidak memanggil createOutcome di initState, akan dipanggil ketika tombol ditekan
+  }
 
-  // Fungsi untuk menampilkan form field tipe string/numerik
+  // Fungsi untuk membuat text field (input angka/teks)
   Widget _buildTextField(String key, String label, {bool isNumeric = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextFormField(
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
         keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-        initialValue: isNumeric ? 
-          (outcomeData[key] != null ? outcomeData[key].toString() : '0') : 
-          (outcomeData[key] ?? ''),
+        initialValue: outcomeData[key]?.toString() ?? '',
         onChanged: (value) {
           setState(() {
             if (isNumeric) {
-              outcomeData[key] = key.contains('konsumsi') ? 
-                double.tryParse(value) ?? 0.0 : 
-                int.tryParse(value) ?? 0;
+              outcomeData[key] = key.contains('konsumsi')
+                  ? double.tryParse(value) ?? 0.0
+                  : int.tryParse(value) ?? 0;
             } else {
               outcomeData[key] = value;
             }
@@ -95,7 +85,7 @@ void initState() {
     );
   }
 
-  // Fungsi untuk menampilkan checkbox
+  // Fungsi untuk membuat checkbox
   Widget _buildCheckbox(String key, String label) {
     return CheckboxListTile(
       title: Text(label),
@@ -107,158 +97,118 @@ void initState() {
       },
     );
   }
-  
-  // Fungsi untuk memeriksa apakah field harus ditampilkan berdasarkan jenis bantuan
-  bool _shouldShowField(String key) {
-    final String jenisBantuan = widget.jenisBantuan;
-    
-    // Jika SAB & MCK, tampilkan semua field
-    if (jenisBantuan.contains('SAB') && jenisBantuan.contains('MCK')) {
-      return true;
-    }
-    
-    // Field khusus MCK yang tidak ditampilkan jika jenis bantuan hanya SAB
-    final mckOnlyFields = [
-      'aksesKelompokRentan', 'rasioMCKMemadai', 'keberlanjutanEkosistem', 
-      'pemanfaatanAirEfisien', 'limbahDikelolaAman', 'adaSeptictank', 
-      'sanitasiBersih', 'toiletBerfungsi', 'aksesSanitasiMemadai', 'eksposurLimbah'
-    ];
-    
-    // Field khusus SAB yang tidak ditampilkan jika jenis bantuan hanya MCK
-    final sabOnlyFields = [
-      'efisiensiAir', 'ramahLingkungan', 'keadilanAkses', 'adaptabilitasSistem',
-      'airTersediaSetiapSaat', 'bisaDiminum', 'pengelolaanProfesional', 'aksesMudah',
-      'airHanyaUntukMCK', 'aksesTerbatas', 'butuhUsahaJarak', 'bisaDiminum', 
-      'bisaDipakaiMCK', 'ecoKeberlanjutan'
-    ];
-    
-    if (jenisBantuan.contains('SAB') && !jenisBantuan.contains('MCK')) {
-      return !mckOnlyFields.contains(key);
-    }
-    
-    if (jenisBantuan.contains('MCK') && !jenisBantuan.contains('SAB')) {
-      return !sabOnlyFields.contains(key);
-    }
-    
-    // Default: tampilkan semua field
-    return true;
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Buat Outcome Baru ID: ${widget.formId}")),
-      body: isLoading 
-        ? Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Jenis Bantuan: ${widget.jenisBantuan}", 
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          SizedBox(height: 16),
-                          
-                          // Data umum - selalu ditampilkan
-                          Text("Data Umum", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                          SizedBox(height: 8),
-                          
-                          if (_shouldShowField('konsumsiAirPerTahun'))
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Jenis Bantuan: ${widget.jenisBantuan}",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            SizedBox(height: 16),
+                            
+                            // Section: Pertanyaan Umum (selalu tampil)
+                            Text("Pertanyaan Umum",
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            SizedBox(height: 8),
                             _buildTextField('konsumsiAirPerTahun', 'Konsumsi Air per Tahun (liter)', isNumeric: true),
-                            
-                          if (_shouldShowField('kualitasAir'))
-                            _buildTextField('kualitasAir', 'Kualitas Air'),
-                            
-                          if (_shouldShowField('rataRataTerpaparPenyakitSebelum'))
+                            // Kualitas Air diubah menjadi checkbox
+                            _buildCheckbox('kualitasAir', 'Kualitas air sudah sesuai kebutuhan?'),
                             _buildTextField('rataRataTerpaparPenyakitSebelum', 'Rata-rata Terpapar Penyakit Sebelum', isNumeric: true),
-                            
-                          if (_shouldShowField('rataRataTerpaparPenyakitSesudah'))
                             _buildTextField('rataRataTerpaparPenyakitSesudah', 'Rata-rata Terpapar Penyakit Sesudah', isNumeric: true),
+                            SizedBox(height: 16),
                             
+                            // Section: Data untuk SAB (hanya jika jenis bantuan mengandung "SAB")
+                            if (widget.jenisBantuan.contains('SAB')) ...[
+                              Text("Data untuk SAB",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              SizedBox(height: 8),
+                              _buildCheckbox('airHanyaUntukMCK', 'Air hanya untuk MCK'),
+                              _buildCheckbox('aksesTerbatas', 'Akses terbatas'),
+                              _buildCheckbox('butuhUsahaJarak', 'Butuh usaha jarak'),
+                              _buildCheckbox('airTersediaSetiapSaat', 'Air tersedia setiap saat'),
+                              _buildCheckbox('pengelolaanProfesional', 'Pengelolaan profesional'),
+                              _buildCheckbox('aksesMudah', 'Akses mudah'),
+                              _buildCheckbox('efisiensiAir', 'Efisiensi air'),
+                              _buildCheckbox('ramahLingkungan', 'Ramah lingkungan'),
+                              _buildCheckbox('keadilanAkses', 'Keadilan akses'),
+                              _buildCheckbox('adaptabilitasSistem', 'Adaptabilitas sistem'),
+                              SizedBox(height: 16),
+                            ],
                             
-                          if (_shouldShowField('penilaianSaranaAirBersih'))
-                            _buildTextField('penilaianSaranaAirBersih', 'Penilaian Sarana Air Bersih'),
-                            
-                          if (_shouldShowField('penilaianSanitasi'))
-                            _buildTextField('penilaianSanitasi', 'Penilaian Sanitasi'),
-                            
-                          SizedBox(height: 16),
-                            
-                          // Tampilkan checkbox untuk boolean fields
-                          Text("Parameter Boolean", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                          SizedBox(height: 8),
-                          
-                          // Filter fields sesuai jenis bantuan
-                          ...outcomeData.keys
-                            .where((key) => outcomeData[key] is bool && _shouldShowField(key))
-                            .map((key) {
-                              String label = _formatLabel(key);
-                              return _buildCheckbox(key, label);
-                            })
-                            .toList(),
-                        ],
+                            // Section: Data untuk MCK (hanya jika jenis bantuan mengandung "MCK")
+                            if (widget.jenisBantuan.contains('MCK')) ...[
+                              Text("Data untuk MCK",
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              SizedBox(height: 8),
+                              _buildCheckbox('toiletBerfungsi', 'Toilet berfungsi'),
+                              _buildCheckbox('aksesSanitasiMemadai', 'Akses sanitasi memadai'),
+                              _buildCheckbox('eksposurLimbah', 'Eksposur limbah'),
+                              _buildCheckbox('limbahDikelolaAman', 'Limbah dikelola aman'),
+                              _buildCheckbox('adaSeptictank', 'Ada septictank'),
+                              _buildCheckbox('sanitasiBersih', 'Sanitasi bersih'),
+                              _buildCheckbox('aksesKelompokRentan', 'Akses kelompok rentan'),
+                              _buildCheckbox('rasioMCKMemadai', 'Rasio MCK memadai'),
+                              _buildCheckbox('keberlanjutanEkosistem', 'Keberlanjutan ekosistem'),
+                              _buildCheckbox('pemanfaatanAirEfisien', 'Pemanfaatan air efisien'),
+                              SizedBox(height: 16),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  
-                  SizedBox(height: 16),
-                  ElevatedButton(
-  onPressed: () {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      debugPrint("Data outcome sebelum dikirim: $outcomeData");
-      setState(() => isLoading = true);
-      
-      Provider.of<OutcomeProvider>(context, listen: false)
-          .createOutcome(widget.formId, outcomeData)
-          .then((success) {
-            setState(() => isLoading = false);
-            if (success) {
-              debugPrint("Outcome berhasil dibuat.");
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Outcome berhasil dibuat')),
-              );
-              Navigator.pop(context);
-            } else {
-              final error = Provider.of<OutcomeProvider>(context, listen: false).errorMessage;
-              debugPrint("Outcome gagal dibuat. Error: $error");
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Gagal membuat Outcome')),
-              );
-            }
-          });
-    }
-  },
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(vertical: 16),
-  ),
-  child: const Text('Simpan Outcome Baru'),
-),
-
-
-                ],
+                    
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+                          debugPrint("Data outcome sebelum dikirim: $outcomeData");
+                          setState(() => isLoading = true);
+                          
+                          Provider.of<OutcomeProvider>(context, listen: false)
+                              .createOutcome(widget.formId, outcomeData)
+                              .then((success) {
+                            setState(() => isLoading = false);
+                            if (success) {
+                              debugPrint("Outcome berhasil dibuat.");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Outcome berhasil dibuat')),
+                              );
+                              Navigator.pop(context);
+                            } else {
+                              final error = Provider.of<OutcomeProvider>(context, listen: false).errorMessage;
+                              debugPrint("Outcome gagal dibuat. Error: $error");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Gagal membuat Outcome')),
+                              );
+                            }
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('Simpan Outcome Baru'),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
     );
-  }
-  
-  // Helper function untuk memformat label dari key
-  String _formatLabel(String key) {
-    // Mengubah camelCase menjadi format lebih mudah dibaca
-    final formattedKey = key.replaceAllMapped(
-      RegExp(r'([A-Z])'), 
-      (match) => ' ${match.group(0)!.toLowerCase()}'
-    );
-    
-    return formattedKey.substring(0, 1).toUpperCase() + formattedKey.substring(1);
   }
 }

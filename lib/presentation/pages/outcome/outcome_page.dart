@@ -20,7 +20,7 @@ class _OutcomePageState extends State<OutcomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Outcome')),
-      body: Consumer<InputProvider>(
+      body: Consumer<InputProvider>( 
         builder: (context, inputProvider, child) {
           if (inputProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
