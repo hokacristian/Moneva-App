@@ -31,22 +31,26 @@ class OutcomeProvider extends ChangeNotifier {
 
   // ✅ Buat Outcome baru
   Future<bool> createOutcome(int formInputId, Map<String, dynamic> data) async {
-    _isLoading = true;
-    notifyListeners();
+  _isLoading = true;
+  notifyListeners();
 
-    try {
-      await apiService.postOutcome(formInputId, data);
-      _errorMessage = null;
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
+  try {
+    debugPrint("Memulai pembuatan outcome dengan formInputId: $formInputId, data: $data");
+    await apiService.postOutcome(formInputId, data);
+    debugPrint("Outcome berhasil dibuat untuk formInputId: $formInputId");
+    _errorMessage = null;
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  } catch (e) {
+    _errorMessage = e.toString();
+    debugPrint("Gagal membuat outcome: $_errorMessage");
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
+
 
   // ✅ Update Outcome
   Future<bool> updateOutcome(int id, Map<String, dynamic> data) async {
