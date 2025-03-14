@@ -19,6 +19,8 @@ dependencies:
   path: ^1.8.1
   shared_preferences: ^2.3.3
   geolocator: ^13.0.2
+  intl: ^0.17.0
+
 
 
 

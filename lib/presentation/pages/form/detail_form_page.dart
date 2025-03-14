@@ -1,4 +1,5 @@
 // detail_form_page.dart
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:moneva/data/providers/input_provider.dart';
@@ -17,6 +18,8 @@ class _DetailFormPageState extends State<DetailFormPage> {
   bool isLoading = false;
   Map<String, dynamic>? formInput;
   String? errorMessage;
+  final formatRupiah = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+
 
   @override
   void initState() {
@@ -115,19 +118,20 @@ class _DetailFormPageState extends State<DetailFormPage> {
                             ),
                             const SizedBox(height: 16),
                           ],
-IconButton(
-  icon: const Icon(Icons.edit, color: Colors.blue),
-  onPressed: () async {
-    bool? result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => EditInputFormPage(formId: widget.formId)),
-    );
-    if (result == true) {
-      _fetchFormDetail(); // Refresh data setelah edit
-    }
-  },
-),
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () async {
+                              bool? result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditInputFormPage(
+                                        formId: widget.formId)),
+                              );
+                              if (result == true) {
+                                _fetchFormDetail(); // Refresh data setelah edit
+                              }
+                            },
+                          ),
                           // ✅ Gambar (jika tersedia)
                           if (formInput!["img"] != null)
                             Center(
@@ -233,11 +237,21 @@ IconButton(
                           buildDetailRow("Sistem Pengelolaan",
                               formInput!["sistemPengelolaan"]),
                           buildDetailRow("Sumber Air", formInput!["sumberAir"]),
-                          buildDetailRow("Harga Air", formInput!["hargaAir"]),
+                          buildDetailRow(
+                            "Harga Air",
+                            NumberFormat.currency(
+                                    locale: 'id_ID',
+                                    symbol: 'Rp ',
+                                    decimalDigits: 0)
+                                .format(formInput!["hargaAir"]),
+                          ),
                           buildDetailRow("pH", formInput!["pH"]),
-                          buildDetailRow("TDS (ppm)", formInput!["TDS"]),
-                          buildDetailRow("EC (µS/cm)", formInput!["EC"]),
-                          buildDetailRow("ORP (mV)", formInput!["ORP"]),
+                          buildDetailRow(
+                              "TDS (ppm)", "${formInput!["TDS"]} ppm"),
+                          buildDetailRow(
+                              "TDS (ppm)", "${formInput!["EC"]} µS/cm"),
+                          buildDetailRow(
+                              "TDS (ppm)", "${formInput!["ORP"]} mV"),
                           const SizedBox(height: 16),
                           if (formInput!["outcome"] != null) ...[
                             const Text("Outcome",
@@ -312,7 +326,7 @@ IconButton(
                                 formInput!["outcome"]["pemanfaatanAirEfisien"]),
                             const SizedBox(height: 16),
                           ],
-  
+
                           if (formInput!["dampak"] != null) ...[
                             const Text("Dampak",
                                 style: TextStyle(
@@ -325,23 +339,37 @@ IconButton(
                             buildDetailRow("Sumber Air Sesudah",
                                 formInput!["dampak"]["sumberAirSesudah"]),
 
-                            // 🔹 Biaya Listrik Sebelum & Sesudah
-                            buildDetailRow("Biaya Listrik Sebelum",
-                                formInput!["dampak"]["biayaListrikSebelum"]),
-                            buildDetailRow("Biaya Listrik Sesudah",
-                                formInput!["dampak"]["biayaListrikSesudah"]),
+                            // Format Rupiah dengan locale 'id_ID'
 
-                            // 🔹 Biaya Berobat Sebelum & Sesudah
-                            buildDetailRow("Biaya Berobat Sebelum",
-                                formInput!["dampak"]["biayaBerobatSebelum"]),
-                            buildDetailRow("Biaya Berobat Sesudah",
-                                formInput!["dampak"]["biayaBerobatSesudah"]),
+// 🔹 Biaya Listrik Sebelum & Sesudah
+buildDetailRow(
+  "Biaya Listrik Sebelum",
+  formatRupiah.format(formInput!["dampak"]["biayaListrikSebelum"]),
+),
+buildDetailRow(
+  "Biaya Listrik Sesudah",
+  formatRupiah.format(formInput!["dampak"]["biayaListrikSesudah"]),
+),
 
-                            // 🔹 Biaya Air Bersih Sebelum & Sesudah
-                            buildDetailRow("Biaya Air Pemenuhan Bersih Sebelum",
-                                formInput!["dampak"]["biayaAirBersihSebelum"]),
-                            buildDetailRow("Biaya Air Pemenuhan Bersih Sesudah",
-                                formInput!["dampak"]["biayaAirBersihSesudah"]),
+// 🔹 Biaya Berobat Sebelum & Sesudah
+buildDetailRow(
+  "Biaya Berobat Sebelum",
+  formatRupiah.format(formInput!["dampak"]["biayaBerobatSebelum"]),
+),
+buildDetailRow(
+  "Biaya Berobat Sesudah",
+  formatRupiah.format(formInput!["dampak"]["biayaBerobatSesudah"]),
+),
+
+// 🔹 Biaya Air Pemenuhan Bersih Sebelum & Sesudah
+buildDetailRow(
+  "Biaya Air Pemenuhan Bersih Sebelum",
+  formatRupiah.format(formInput!["dampak"]["biayaAirBersihSebelum"]),
+),
+buildDetailRow(
+  "Biaya Air Pemenuhan Bersih Sesudah",
+  formatRupiah.format(formInput!["dampak"]["biayaAirBersihSesudah"]),
+),
 
                             // 🔹 Peningkatan Ekonomi Sebelum & Sesudah
                             buildDetailRow(
