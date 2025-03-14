@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:moneva/core/utils/sessionmanager.dart';
@@ -140,19 +141,47 @@ class ApiService {
 }
 
 
-  Future<Map<String, dynamic>> updateFormInput(int id, Map<String, dynamic> data) async {
-    final response = await http.patch(
-      Uri.parse('$baseUrl/form/input/$id'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(data),
-    );
+  // Future<http.Response> updateFormInput(int id, Map<String, dynamic> data) async {
+  //   final url = Uri.parse('$baseUrl/form/input/$id'); // Sesuaikan endpoint API
+  //   final response = await http.patch(
+  //     url,
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: jsonEncode(data),
+  //   );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Gagal memperbarui FormInput');
+  //   return response;
+  // }
+
+  Future<http.Response> updateFormInput(int id, Map<String, dynamic> data, File? image) async {
+  final token = await sessionManager.getToken();
+  if (token == null) throw Exception("Token tidak ditemukan. Silakan login ulang.");
+
+  var request = http.MultipartRequest('PATCH', Uri.parse('$baseUrl/form/input/$id'));
+  request.headers['Authorization'] = 'Bearer $token';
+  // Jangan set Content-Type secara manual untuk MultipartRequest
+
+  // Tambahkan semua field kecuali "img"
+  data.forEach((key, value) {
+    if (key != 'img' && value != null) {
+      request.fields[key] = value.toString();
     }
+  });
+
+  // Jika ada gambar baru, tambahkan sebagai file multipart
+  if (image != null) {
+    request.files.add(await http.MultipartFile.fromPath('img', image.path));
+  } else if (data['img'] != null) {
+    // Jika tidak ada gambar baru, tambahkan field 'img' dengan URL lama
+    request.fields['img'] = data['img'].toString();
   }
+
+  final streamedResponse = await request.send();
+  return await http.Response.fromStream(streamedResponse);
+}
+
+
 
    // ✅ POST Dampak
   Future<Map<String, dynamic>> postDampak(int formInputId, Map<String, dynamic> data) async {

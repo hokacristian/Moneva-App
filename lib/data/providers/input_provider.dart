@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:moneva/data/services/api_service.dart';
 import 'auth_provider.dart';
@@ -71,23 +72,36 @@ class InputProvider extends ChangeNotifier {
 }
 
 
-  Future<bool> updateFormInput(int id, Map<String, dynamic> data) async {
-    _isLoading = true;
-    notifyListeners();
+  Future<bool> updateFormInput(int id, Map<String, dynamic> data, File? image) async {
+  _isLoading = true;
+  notifyListeners();
 
-    try {
-      await apiService.updateFormInput(id, data);
+  try {
+    debugPrint("Mengirim data PATCH ke API: $data");
+    final response = await apiService.updateFormInput(id, data, image);
+
+    debugPrint("Response API: ${response.statusCode} - ${response.body}");
+
+    if (response.statusCode == 200) { // atau sesuai kode sukses API (misal 200)
       _errorMessage = null;
       _isLoading = false;
       notifyListeners();
       return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
+    } else {
+      debugPrint("Error dari server: ${response.body}");
+      throw Exception("Gagal memperbarui FormInput: ${response.body}");
     }
+  } catch (e) {
+    _errorMessage = e.toString();
+    debugPrint("Error saat updateFormInput: $_errorMessage");
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
+
+
+
 
    // 🔥 Fetch Places
   Future<void> fetchPlaces() async {

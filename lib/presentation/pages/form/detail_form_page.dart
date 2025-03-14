@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:moneva/data/providers/input_provider.dart';
+import 'package:moneva/presentation/pages/form/edit_input_form_page.dart';
 
 class DetailFormPage extends StatefulWidget {
   final int formId;
@@ -114,7 +115,19 @@ class _DetailFormPageState extends State<DetailFormPage> {
                             ),
                             const SizedBox(height: 16),
                           ],
-
+IconButton(
+  icon: const Icon(Icons.edit, color: Colors.blue),
+  onPressed: () async {
+    bool? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => EditInputFormPage(formId: widget.formId)),
+    );
+    if (result == true) {
+      _fetchFormDetail(); // Refresh data setelah edit
+    }
+  },
+),
                           // ✅ Gambar (jika tersedia)
                           if (formInput!["img"] != null)
                             Center(
