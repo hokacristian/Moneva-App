@@ -261,18 +261,23 @@ Widget build(BuildContext context) {
                 TextFormField(
                   controller: pHController,
                   decoration: InputDecoration(labelText: 'pH'),
+                  keyboardType: TextInputType.number, 
+
                 ),
                 TextFormField(
                   controller: TDSController,
                   decoration: InputDecoration(labelText: 'TDS(ppm)'),
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: ECController,
                   decoration: InputDecoration(labelText: 'EC(µS/cm)'),
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: ORPController,
                   decoration: InputDecoration(labelText: 'ORP(mV)'),
+                  keyboardType: TextInputType.number,
                 ),
                 SizedBox(height: 16),
                 Text('Latitude: ${latitude ?? "Mengambil..."}'),
