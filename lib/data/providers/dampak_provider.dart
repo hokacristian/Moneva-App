@@ -15,19 +15,22 @@ class DampakProvider extends ChangeNotifier {
 
   // ✅ Ambil Dampak berdasarkan ID
   Future<void> fetchDampak(int id) async {
-    _isLoading = true;
-    notifyListeners();
+  _isLoading = true;
+  notifyListeners();
 
-    try {
-      _dampak = await apiService.getDampak(id);
-      _errorMessage = null;
-    } catch (e) {
-      _errorMessage = e.toString();
-    }
+  try {
+    final response = await apiService.getDampak(id);
 
-    _isLoading = false;
-    notifyListeners();
+    _dampak = response['data'];
+
+    _errorMessage = null;
+  } catch (e) {
+    _errorMessage = e.toString();
   }
+
+  _isLoading = false;
+  notifyListeners();
+}
 
   // ✅ Buat Dampak baru
   Future<bool> createDampak(int formInputId, Map<String, dynamic> data) async {

@@ -1,8 +1,8 @@
-// dampak_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:moneva/data/providers/input_provider.dart';
 import 'package:moneva/presentation/pages/dampak/editDampak_page.dart';
+import 'package:moneva/presentation/pages/dampak/detail_dampak_page.dart';
 
 class DampakPage extends StatefulWidget {
   @override
@@ -44,6 +44,8 @@ class _DampakPageState extends State<DampakPage> {
             itemCount: forms.length,
             itemBuilder: (context, index) {
               final form = forms[index];
+              final dampak = form['dampak']; // Ambil data dampak dari form
+
               return Card(
                 elevation: 3,
                 margin: const EdgeInsets.only(bottom: 12),
@@ -66,18 +68,41 @@ class _DampakPageState extends State<DampakPage> {
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  subtitle: const Text("History Dampak"),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigasi ke EditDampakPage dengan mengoper formId sesuai yang ditekan.
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EditDampakPage(formId: form['id']),
+                  subtitle:
+                      Text("Jenis Bantuan: ${form['jenisBantuan'] ?? ''}"),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (dampak != null)
+                        IconButton(
+                          icon: const Icon(Icons.visibility),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailDampakPage(
+                                  // Kirim dampakId dari data dampak
+                                  dampakId: dampak['id'],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditDampakPage(
+                                formId: form['id'],
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
               );
             },
