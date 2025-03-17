@@ -23,7 +23,8 @@ class _InputFormPageState extends State<InputFormPage> {
   final TextEditingController jmlhLakiController = TextEditingController();
   final TextEditingController debitAirController = TextEditingController();
   final TextEditingController pemakaianAirController = TextEditingController();
-  final TextEditingController sistemPengelolaanController = TextEditingController();
+  final TextEditingController sistemPengelolaanController =
+      TextEditingController();
   final TextEditingController sumberAirController = TextEditingController();
   final TextEditingController hargaAirController = TextEditingController();
   final TextEditingController pHController = TextEditingController();
@@ -34,9 +35,28 @@ class _InputFormPageState extends State<InputFormPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() =>
-        Provider.of<InputProvider>(context, listen: false).fetchPlaces());
-    _getCurrentLocation();
+    Future.microtask(
+        () => Provider.of<InputProvider>(context, listen: false).fetchPlaces());
+    _requestLocationPermission();
+  }
+
+  // Fungsi untuk meminta izin lokasi
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.deniedForever) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Izin lokasi ditolak secara permanen.')),
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
+      _getCurrentLocation();
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -71,15 +91,16 @@ class _InputFormPageState extends State<InputFormPage> {
         'jmlhKK': int.tryParse(jmlhKKController.text) ?? 0,
         'jmlhPerempuan': int.tryParse(jmlhPerempuanController.text) ?? 0,
         'jmlhLaki': int.tryParse(jmlhLakiController.text) ?? 0,
-        'debitAir': debitAirController.text,
+        'debitAir':
+            debitAirController.text.isNotEmpty ? debitAirController.text : "0",
         'pemakaianAir': pemakaianAirController.text,
         'sistemPengelolaan': sistemPengelolaanController.text,
         'sumberAir': sumberAirController.text,
         'hargaAir': double.tryParse(hargaAirController.text) ?? 0.0,
-        'pH': double.tryParse(pHController.text),
-        'TDS': double.tryParse(TDSController.text),
-        'EC': double.tryParse(ECController.text),
-        'ORP': double.tryParse(ORPController.text),
+        'pH': double.tryParse(pHController.text) ?? 0.0,
+        'TDS': double.tryParse(TDSController.text) ?? 0.0,
+        'EC': double.tryParse(ECController.text) ?? 0.0,
+        'ORP': double.tryParse(ORPController.text) ?? 0.0,
       };
 
       Provider.of<InputProvider>(context, listen: false)
@@ -99,105 +120,103 @@ class _InputFormPageState extends State<InputFormPage> {
     }
   }
 
-    // Tampilkan dialog untuk menambah lokasi
-void _showAddLocationDialog() {
-  final TextEditingController locationController = TextEditingController();
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text("Tambah Lokasi"),
-        content: TextField(
-          controller: locationController,
-          decoration: InputDecoration(hintText: "Masukkan nama lokasi"),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Batal
-            },
-            child: Text("Batal"),
+  // Tampilkan dialog untuk menambah lokasi
+  void _showAddLocationDialog() {
+    final TextEditingController locationController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Tambah Lokasi"),
+          content: TextField(
+            controller: locationController,
+            decoration: InputDecoration(hintText: "Masukkan nama lokasi"),
           ),
-          TextButton(
-            onPressed: () {
-              final newLocation = locationController.text.trim();
-              if (newLocation.isNotEmpty) {
-                Provider.of<InputProvider>(context, listen: false)
-                    .createPlace({"name": newLocation})
-                    .then((success) {
-                  if (success) {
-                    // Jangan update selectedLocation secara otomatis
-                    // Jangan panggil fetchPlaces di sini
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Lokasi berhasil ditambahkan")),
-                    );
-                    Navigator.pop(context);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Gagal menambahkan lokasi")),
-                    );
-                  }
-                });
-              }
-            },
-            child: Text("Simpan"),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
-
-@override
-Widget build(BuildContext context) {
-  final places = Provider.of<InputProvider>(context).places;
-  
-  // Filter daftar lokasi agar hanya muncul lokasi dengan nama unik
-  final uniquePlaces = places.fold<List<Map<String, dynamic>>>([], (acc, element) {
-    if (!acc.any((item) => item['name'] == element['name'])) {
-      acc.add(element);
-    }
-    return acc;
-  });
-
-  return Scaffold(
-    appBar: AppBar(title: Text('Input Data')),
-    body: Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-            DropdownButtonFormField<String>(
-  value: selectedLocation,
-  hint: Text('Pilih Lokasi'),
-  onTap: () {
-    Provider.of<InputProvider>(context, listen: false).fetchPlaces();
-  },
-  items: uniquePlaces.map((place) {
-    return DropdownMenuItem<String>(
-      value: place['name'].toString(),
-      child: Text(place['name'].toString()),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Batal
+              },
+              child: Text("Batal"),
+            ),
+            TextButton(
+              onPressed: () {
+                final newLocation = locationController.text.trim();
+                if (newLocation.isNotEmpty) {
+                  Provider.of<InputProvider>(context, listen: false)
+                      .createPlace({"name": newLocation}).then((success) {
+                    if (success) {
+                      // Jangan update selectedLocation secara otomatis
+                      // Jangan panggil fetchPlaces di sini
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Lokasi berhasil ditambahkan")),
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Gagal menambahkan lokasi")),
+                      );
+                    }
+                  });
+                }
+              },
+              child: Text("Simpan"),
+            ),
+          ],
+        );
+      },
     );
-  }).toList(),
-  onChanged: (value) {
-    setState(() {
-      selectedLocation = value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final places = Provider.of<InputProvider>(context).places;
+
+    // Filter daftar lokasi agar hanya muncul lokasi dengan nama unik
+    final uniquePlaces =
+        places.fold<List<Map<String, dynamic>>>([], (acc, element) {
+      if (!acc.any((item) => item['name'] == element['name'])) {
+        acc.add(element);
+      }
+      return acc;
     });
-  },
-),
 
+    return Scaffold(
+      appBar: AppBar(title: Text('Input Data')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DropdownButtonFormField<String>(
+                  value: selectedLocation,
+                  hint: Text('Pilih Lokasi'),
+                  onTap: () {
+                    Provider.of<InputProvider>(context, listen: false)
+                        .fetchPlaces();
+                  },
+                  items: uniquePlaces.map((place) {
+                    return DropdownMenuItem<String>(
+                      value: place['name'].toString(),
+                      child: Text(place['name'].toString()),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLocation = value;
+                    });
+                  },
+                ),
 
-              // Tombol Tambah Lokasi
-              TextButton.icon(
-                onPressed: _showAddLocationDialog,
-                icon: Icon(Icons.add),
-                label: Text("Tambah Lokasi"),
-              ),
+                // Tombol Tambah Lokasi
+                TextButton.icon(
+                  onPressed: _showAddLocationDialog,
+                  icon: Icon(Icons.add),
+                  label: Text("Tambah Lokasi"),
+                ),
                 SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: selectedBantuan,
@@ -213,41 +232,46 @@ Widget build(BuildContext context) {
                       selectedBantuan = value;
                     });
                   },
-                  validator: (value) => value == null ? 'Pilih jenis bantuan' : null,
+                  validator: (value) =>
+                      value == null ? 'Pilih jenis bantuan' : null,
                 ),
                 SizedBox(height: 16),
                 TextFormField(
                   controller: jmlhBantuanController,
                   decoration: InputDecoration(labelText: 'Jumlah Bantuan'),
-                  keyboardType: TextInputType.number, 
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: jmlhKKController,
                   decoration: InputDecoration(labelText: 'Jumlah KK'),
-                  keyboardType: TextInputType.number, 
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: jmlhPerempuanController,
                   decoration: InputDecoration(labelText: 'Jumlah Perempuan'),
-                  keyboardType: TextInputType.number, 
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: jmlhLakiController,
                   decoration: InputDecoration(labelText: 'Jumlah Laki'),
-                  keyboardType: TextInputType.number, 
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: debitAirController,
-                  decoration: InputDecoration(labelText: 'Jumlah debit air yang dihasilkan (l)'),
-                  keyboardType: TextInputType.number, 
+                  decoration: InputDecoration(
+                      labelText: 'Jumlah debit air yang dihasilkan (l)'),
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: pemakaianAirController,
-                  decoration: InputDecoration(labelText: 'Pemakaian Air(Untuk keperluan apa saja)'),
+                  decoration: InputDecoration(
+                      labelText: 'Pemakaian Air(Untuk keperluan apa saja)'),
                 ),
                 TextFormField(
                   controller: sistemPengelolaanController,
-                  decoration: InputDecoration(labelText: 'Sistem pengelolaan sanitasi dan sarana air bersih'),
+                  decoration: InputDecoration(
+                      labelText:
+                          'Sistem pengelolaan sanitasi dan sarana air bersih'),
                 ),
                 TextFormField(
                   controller: sumberAirController,
@@ -255,14 +279,14 @@ Widget build(BuildContext context) {
                 ),
                 TextFormField(
                   controller: hargaAirController,
-                  decoration: InputDecoration(labelText: 'Harga Air yang dibayar'),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true), 
+                  decoration:
+                      InputDecoration(labelText: 'Harga Air yang dibayar'),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
                 TextFormField(
                   controller: pHController,
                   decoration: InputDecoration(labelText: 'pH'),
-                  keyboardType: TextInputType.number, 
-
+                  keyboardType: TextInputType.number,
                 ),
                 TextFormField(
                   controller: TDSController,

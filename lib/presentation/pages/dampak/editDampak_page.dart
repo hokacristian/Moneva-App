@@ -107,26 +107,61 @@ class _EditDampakPageState extends State<EditDampakPage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
-                            _buildTextField("sumberAirSebelum", "Sumber Air Sebelum"),
-                            _buildTextField("sumberAirSesudah", "Sumber Air Sesudah"),
-                            _buildTextField("biayaListrikSebelum", "Biaya Listrik Sebelum", isNumeric: true),
-                            _buildTextField("biayaListrikSesudah", "Biaya Listrik Sesudah", isNumeric: true),
-                            _buildTextField("biayaBerobatSebelum", "Biaya Berobat Sebelum", isNumeric: true),
-                            _buildTextField("biayaBerobatSesudah", "Biaya Berobat Sesudah", isNumeric: true),
-                            _buildTextField("biayaAirBersihSebelum", "Biaya Air Pemenuhan Bersih Sebelum", isNumeric: true),
-                            _buildTextField("biayaAirBersihSesudah", "Biaya Air Pemenuhan Bersih Sesudah", isNumeric: true),
-                            _buildTextField("peningkatanEkonomiSebelum", "Peningkatan Ekonomi Sebelum", isNumeric: true),
-                            _buildTextField("peningkatanEkonomiSesudah", "Peningkatan Ekonomi Sesudah", isNumeric: true),
-                            _buildTextField("penurunanOrangSakitSebelum", "Penurunan Orang Sakit Sebelum", isNumeric: true),
-                            _buildTextField("penurunanOrangSakitSesudah", "Penurunan Orang Sakit Sesudah", isNumeric: true),
-                            _buildTextField("penurunanStuntingSebelum", "Penurunan Stunting Sebelum", isNumeric: true),
-                            _buildTextField("penurunanStuntingSesudah", "Penurunan Stunting Sesudah", isNumeric: true),
-                            _buildTextField("peningkatanIndeksKesehatanSebelum", "Peningkatan Indeks Kesehatan Masyarakat Sebelum (terutama perempuan dan anak-anak)", isNumeric: true),
-                            _buildTextField("peningkatanIndeksKesehatanSesudah", "Peningkatan Indeks Kesehatan Masyarakat Sesudah (terutama perempuan dan anak-anak)", isNumeric: true),
-                            _buildTextField("volumeLimbahDikelola", "Volume Limbah Yang Berhasil Dikelola Masyarakat", isNumeric: true),
-                            _buildCheckbox("prosesKonservasiAir", "Proses Konservasi Air"),
-                            _buildTextField("penurunanIndexPencemaranSebelum", "Penurunan Index Pencemaran Lingkungan Sebelum", isNumeric: true),
-                            _buildTextField("penurunanIndexPencemaranSesudah", "Penurunan Index Pencemaran Lingkungan Sesudah", isNumeric: true),
+                            _buildTextField(
+                                "sumberAirSebelum", "Sumber Air Sebelum"),
+                            _buildTextField(
+                                "sumberAirSesudah", "Sumber Air Sesudah"),
+                            _buildTextField(
+                                "biayaListrikSebelum", "Biaya Listrik Sebelum",
+                                isNumeric: true),
+                            _buildTextField(
+                                "biayaListrikSesudah", "Biaya Listrik Sesudah",
+                                isNumeric: true),
+                            _buildTextField(
+                                "biayaBerobatSebelum", "Biaya Berobat Sebelum",
+                                isNumeric: true),
+                            _buildTextField(
+                                "biayaBerobatSesudah", "Biaya Berobat Sesudah",
+                                isNumeric: true),
+                            _buildTextField("biayaAirBersihSebelum",
+                                "Biaya Air Pemenuhan Bersih Sebelum",
+                                isNumeric: true),
+                            _buildTextField("biayaAirBersihSesudah",
+                                "Biaya Air Pemenuhan Bersih Sesudah",
+                                isNumeric: true),
+                            _buildTextField("peningkatanEkonomiSebelum",
+                                "Peningkatan Ekonomi Sebelum",
+                                isNumeric: true),
+                            _buildTextField("peningkatanEkonomiSesudah",
+                                "Peningkatan Ekonomi Sesudah",
+                                isNumeric: true),
+                            _buildTextField("penurunanOrangSakitSebelum",
+                                "Penurunan Orang Sakit Sebelum"),
+                            _buildTextField("penurunanOrangSakitSesudah",
+                                "Penurunan Orang Sakit Sesudah"),
+                            _buildTextField("penurunanStuntingSebelum",
+                                "Penurunan Stunting Sebelum",
+                                isNumeric: true),
+                            _buildTextField("penurunanStuntingSesudah",
+                                "Penurunan Stunting Sesudah",
+                                isNumeric: true),
+                            _buildTextField("peningkatanIndeksKesehatanSebelum",
+                                "Peningkatan Indeks Kesehatan Masyarakat Sebelum (terutama perempuan dan anak-anak)",
+                                isNumeric: true),
+                            _buildTextField("peningkatanIndeksKesehatanSesudah",
+                                "Peningkatan Indeks Kesehatan Masyarakat Sesudah (terutama perempuan dan anak-anak)",
+                                isNumeric: true),
+                            _buildTextField("volumeLimbahDikelola",
+                                "Volume Limbah Yang Berhasil Dikelola Masyarakat",
+                                isNumeric: true),
+                            _buildCheckbox(
+                                "prosesKonservasiAir", "Proses Konservasi Air"),
+                            _buildTextField("penurunanIndexPencemaranSebelum",
+                                "Penurunan Index Pencemaran Lingkungan Sebelum",
+                                isNumeric: true),
+                            _buildTextField("penurunanIndexPencemaranSesudah",
+                                "Penurunan Index Pencemaran Lingkungan Sesudah",
+                                isNumeric: true),
                           ],
                         ),
                       ),
@@ -135,44 +170,53 @@ class _EditDampakPageState extends State<EditDampakPage> {
                     Consumer<DampakProvider>(
                       builder: (context, dampakProvider, child) {
                         return ElevatedButton(
-  onPressed: () {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      debugPrint("Data Dampak sebelum dikirim: $dampakData");
-      
-      // Simpan reference ke ScaffoldMessenger dan Navigator sebelum async operation
-      final messenger = ScaffoldMessenger.of(context);
-      final navigator = Navigator.of(context);
-      final provider = Provider.of<DampakProvider>(context, listen: false);
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              debugPrint(
+                                  "Data Dampak sebelum dikirim: $dampakData");
 
-      setState(() => isLoading = true);
-      
-      provider.createDampak(widget.formId, dampakData).then((success) {
-        // Hindari menggunakan setState langsung, gunakan conditional update
-        if (_formKey.currentState != null) {
-          setState(() => isLoading = false);
-        }
-        
-        if (success) {
-          debugPrint("Dampak berhasil dibuat.");
-          messenger.showSnackBar(
-            const SnackBar(content: Text("Dampak berhasil dibuat")),
-          );
-          navigator.pop();
-        } else {
-          debugPrint("Dampak gagal dibuat. Error: ${provider.errorMessage}");
-          messenger.showSnackBar(
-            const SnackBar(content: Text("Gagal membuat Dampak")),
-          );
-        }
-      });
-    }
-  },
-  style: ElevatedButton.styleFrom(
-    padding: const EdgeInsets.symmetric(vertical: 16),
-  ),
-  child: const Text('Simpan Dampak Baru'),
-);
+                              // Simpan reference ke ScaffoldMessenger dan Navigator sebelum async operation
+                              final messenger = ScaffoldMessenger.of(context);
+                              final navigator = Navigator.of(context);
+                              final provider = Provider.of<DampakProvider>(
+                                  context,
+                                  listen: false);
+
+                              setState(() => isLoading = true);
+
+                              provider
+                                  .createDampak(widget.formId, dampakData)
+                                  .then((success) {
+                                // Hindari menggunakan setState langsung, gunakan conditional update
+                                if (_formKey.currentState != null) {
+                                  setState(() => isLoading = false);
+                                }
+
+                                if (success) {
+                                  debugPrint("Dampak berhasil dibuat.");
+                                  messenger.showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text("Dampak berhasil dibuat")),
+                                  );
+                                  navigator.pop();
+                                } else {
+                                  debugPrint(
+                                      "Dampak gagal dibuat. Error: ${provider.errorMessage}");
+                                  messenger.showSnackBar(
+                                    const SnackBar(
+                                        content: Text("Gagal membuat Dampak")),
+                                  );
+                                }
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text('Simpan Dampak Baru'),
+                        );
                       },
                     ),
                   ],

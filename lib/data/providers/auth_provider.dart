@@ -74,7 +74,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> login(String email, String password) async {
   _isLoading = true;
   _errorMessage = null;
-  notifyListeners();
+  notifyListeners(); // Notifikasi perubahan state
 
   try {
     final response = await apiService.login(email, password);
@@ -82,10 +82,6 @@ class AuthProvider extends ChangeNotifier {
     if (response.containsKey('token')) {
       _token = response['token'];
       await sessionManager.saveToken(_token!);
-
-      // 🔥 Debugging tambahan
-      final savedToken = await sessionManager.getToken();
-      print("✅ Token setelah login dan disimpan: $savedToken"); // Debugging
 
       await fetchUserData();
       _isLoading = false;
@@ -99,12 +95,12 @@ class AuthProvider extends ChangeNotifier {
     }
   } catch (error) {
     _errorMessage = "Terjadi kesalahan: ${error.toString()}";
-    print("🚨 Error saat login: $_errorMessage");
     _isLoading = false;
     notifyListeners();
     return false;
   }
 }
+
 
 
   Future<void> logout() async {

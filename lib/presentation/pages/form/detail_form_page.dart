@@ -249,9 +249,9 @@ class _DetailFormPageState extends State<DetailFormPage> {
                           buildDetailRow(
                               "TDS (ppm)", "${formInput!["TDS"]} ppm"),
                           buildDetailRow(
-                              "TDS (ppm)", "${formInput!["EC"]} µS/cm"),
+                              "EC (µS/cm)", "${formInput!["EC"]} µS/cm"),
                           buildDetailRow(
-                              "TDS (ppm)", "${formInput!["ORP"]} mV"),
+                              "ORP (mV)", "${formInput!["ORP"]} mV"),
                           const SizedBox(height: 16),
                           if (formInput!["outcome"] != null) ...[
                             const Text("Outcome",
