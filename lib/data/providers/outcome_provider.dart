@@ -14,20 +14,29 @@ class OutcomeProvider extends ChangeNotifier {
   OutcomeProvider(this.apiService);
 
   // ✅ Ambil Outcome berdasarkan ID
-  Future<void> fetchOutcome(int id) async {
-    _isLoading = true;
-    notifyListeners();
+  Future<void> fetchOutcome(int outcomeId) async {
+  _isLoading = true;
+  notifyListeners();
 
-    try {
-      _outcome = await apiService.getOutcome(id);
-      _errorMessage = null;
-    } catch (e) {
-      _errorMessage = e.toString();
+  try {
+    final response = await apiService.getOutcome(outcomeId);
+    
+    if (response != null && response.containsKey('data')) {
+      _outcome = response['data']; // ✅ Simpan langsung isi dari "data"
+    } else {
+      _outcome = null;
     }
-
-    _isLoading = false;
-    notifyListeners();
+    
+    _errorMessage = null;
+  } catch (e) {
+    _errorMessage = e.toString();
   }
+
+  _isLoading = false;
+  notifyListeners();
+}
+
+
 
   // ✅ Buat Outcome baru
   Future<bool> createOutcome(int formInputId, Map<String, dynamic> data) async {
@@ -53,21 +62,29 @@ class OutcomeProvider extends ChangeNotifier {
 
 
   // ✅ Update Outcome
-  Future<bool> updateOutcome(int id, Map<String, dynamic> data) async {
-    _isLoading = true;
-    notifyListeners();
+Future<bool> updateOutcome(int id, Map<String, dynamic> data) async {
+  _isLoading = true;
+  notifyListeners();
 
-    try {
-      await apiService.updateOutcome(id, data);
-      _errorMessage = null;
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
+  try {
+    final updatedOutcome = await apiService.updateOutcome(id, data);
+
+    if (updatedOutcome != null) {
+      _outcome = updatedOutcome; // **Pastikan data baru disimpan**
+      debugPrint("🔄 Data yang disimpan di provider: $_outcome");
     }
+
+    _errorMessage = null;
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  } catch (e) {
+    _errorMessage = e.toString();
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
+
+
 }

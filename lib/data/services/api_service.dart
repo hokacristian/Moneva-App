@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:moneva/core/utils/sessionmanager.dart';
+import 'dart:developer'; // Tambahkan ini di bagian atas file
+
 
 class ApiService {
   final String baseUrl = dotenv.env['API_BASE_URL']!;
@@ -243,17 +245,33 @@ class ApiService {
   }
 
   // ✅ PATCH Outcome
-  Future<Map<String, dynamic>> updateOutcome(int id, Map<String, dynamic> data) async {
-    final response = await http.patch(
-      Uri.parse('$baseUrl/form/outcome/$id'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(data),
-    );
+  // ✅ PATCH Outcome
+  Future<dynamic> updateOutcome(int id, Map<String, dynamic> data) async {
+    try {
+      // ✅ Debug print untuk melihat data yang dikirim ke API
+      log("Mengirim PATCH ke endpoint: $baseUrl/form/outcome/$id");
+      log("Data yang dikirim: ${jsonEncode(data)}");
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Gagal memperbarui Outcome: ${response.body}');
+      final response = await http.patch(
+        Uri.parse('$baseUrl/form/outcome/$id'), // ✅ Perbaiki interpolasi string
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+
+      // ✅ Debug print untuk melihat response dari server
+      log("Status code: ${response.statusCode}");
+      log("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception("Gagal memperbarui outcome: ${response.body}");
+      }
+    } catch (e) {
+      log("Error dalam updateOutcome: $e");
+      throw Exception("Gagal memperbarui outcome: $e");
     }
   }
 
