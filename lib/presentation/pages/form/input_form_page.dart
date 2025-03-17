@@ -17,6 +17,8 @@ class _InputFormPageState extends State<InputFormPage> {
   File? imageFile;
   double? latitude;
   double? longitude;
+  bool isLoading = false;
+
   final TextEditingController jmlhBantuanController = TextEditingController();
   final TextEditingController jmlhKKController = TextEditingController();
   final TextEditingController jmlhPerempuanController = TextEditingController();
@@ -79,8 +81,10 @@ class _InputFormPageState extends State<InputFormPage> {
     }
   }
 
+  // 🔥 SUBMIT FORM
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && !isLoading) {
+      setState(() => isLoading = true); 
       Map<String, dynamic> formData = {
         'lokasi': selectedLocation,
         'jenisBantuan': selectedBantuan,
@@ -106,6 +110,8 @@ class _InputFormPageState extends State<InputFormPage> {
       Provider.of<InputProvider>(context, listen: false)
           .createFormInput(formData)
           .then((success) {
+        setState(() => isLoading = false); // 🔥 Matikan loading setelah request selesai
+
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Data berhasil dikirim')),
@@ -116,6 +122,11 @@ class _InputFormPageState extends State<InputFormPage> {
             SnackBar(content: Text('Gagal mengirim data')),
           );
         }
+      }).catchError((error) {
+        setState(() => isLoading = false); // 🔥 Pastikan loading mati jika error terjadi
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: $error')),
+        );
       });
     }
   }
@@ -324,10 +335,26 @@ class _InputFormPageState extends State<InputFormPage> {
                   ],
                 ),
                 SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _submitForm,
-                  child: Text('Kirim'),
-                ),
+                 // 🔥 Tombol Kirim dengan Loading Indicator
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : _submitForm, // 🔥 Disable jika loading
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: isLoading
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : Text('Kirim'),
+                  ),
+                )
               ],
             ),
           ),
