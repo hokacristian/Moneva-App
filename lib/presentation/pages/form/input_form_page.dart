@@ -84,7 +84,7 @@ class _InputFormPageState extends State<InputFormPage> {
   // 🔥 SUBMIT FORM
   void _submitForm() {
     if (_formKey.currentState!.validate() && !isLoading) {
-      setState(() => isLoading = true); 
+      setState(() => isLoading = true);
       Map<String, dynamic> formData = {
         'lokasi': selectedLocation,
         'jenisBantuan': selectedBantuan,
@@ -97,9 +97,14 @@ class _InputFormPageState extends State<InputFormPage> {
         'jmlhLaki': int.tryParse(jmlhLakiController.text) ?? 0,
         'debitAir':
             debitAirController.text.isNotEmpty ? debitAirController.text : "0",
-        'pemakaianAir': pemakaianAirController.text,
-        'sistemPengelolaan': sistemPengelolaanController.text,
-        'sumberAir': sumberAirController.text,
+        'pemakaianAir': pemakaianAirController.text.isEmpty
+            ? "-"
+            : pemakaianAirController.text,
+        'sistemPengelolaan': sistemPengelolaanController.text.isEmpty
+            ? "-"
+            : sistemPengelolaanController.text,
+        'sumberAir':
+            sumberAirController.text.isEmpty ? "-" : sumberAirController.text,
         'hargaAir': double.tryParse(hargaAirController.text) ?? 0.0,
         'pH': double.tryParse(pHController.text) ?? 0.0,
         'TDS': double.tryParse(TDSController.text) ?? 0.0,
@@ -110,7 +115,8 @@ class _InputFormPageState extends State<InputFormPage> {
       Provider.of<InputProvider>(context, listen: false)
           .createFormInput(formData)
           .then((success) {
-        setState(() => isLoading = false); // 🔥 Matikan loading setelah request selesai
+        setState(() =>
+            isLoading = false); // 🔥 Matikan loading setelah request selesai
 
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -123,7 +129,8 @@ class _InputFormPageState extends State<InputFormPage> {
           );
         }
       }).catchError((error) {
-        setState(() => isLoading = false); // 🔥 Pastikan loading mati jika error terjadi
+        setState(() =>
+            isLoading = false); // 🔥 Pastikan loading mati jika error terjadi
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Terjadi kesalahan: $error')),
         );
@@ -335,11 +342,13 @@ class _InputFormPageState extends State<InputFormPage> {
                   ],
                 ),
                 SizedBox(height: 16),
-                 // 🔥 Tombol Kirim dengan Loading Indicator
+                // 🔥 Tombol Kirim dengan Loading Indicator
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : _submitForm, // 🔥 Disable jika loading
+                    onPressed: isLoading
+                        ? null
+                        : _submitForm, // 🔥 Disable jika loading
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 16),
                     ),
