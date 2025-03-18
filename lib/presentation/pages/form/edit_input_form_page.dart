@@ -175,7 +175,7 @@ class _EditInputFormPageState extends State<EditInputFormPage> {
                       DropdownButtonFormField<String>(
                         value: selectedBantuan,
                         hint: const Text('Pilih Jenis Bantuan'),
-                        items: ['SAB & MCK', 'SAB', 'MCK'].map((bantuan) {
+                        items: [ 'SAB', 'MCK'].map((bantuan) {
                           return DropdownMenuItem(
                             value: bantuan,
                             child: Text(bantuan),

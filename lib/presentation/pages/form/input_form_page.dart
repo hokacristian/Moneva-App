@@ -239,7 +239,7 @@ class _InputFormPageState extends State<InputFormPage> {
                 DropdownButtonFormField<String>(
                   value: selectedBantuan,
                   hint: Text('Pilih Jenis Bantuan'),
-                  items: ['SAB & MCK', 'SAB', 'MCK'].map((bantuan) {
+                  items: ['SAB', 'MCK'].map((bantuan) {
                     return DropdownMenuItem(
                       value: bantuan,
                       child: Text(bantuan),
